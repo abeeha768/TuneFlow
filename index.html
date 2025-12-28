@@ -2,95 +2,228 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TuneFlow</title>
 <style>
-body { margin:0; font-family:'Segoe UI',sans-serif; background:#121212; color:white; }
-.app { display:flex; height:100vh; flex-direction:row; transition: all 0.3s ease; }
-.sidebar { width:220px; background:#000; padding:20px; flex-shrink:0; transition: all 0.3s ease; }
-.logo { font-size:24px; font-weight:bold; color:#1DB954; margin-bottom:30px; }
-.menu p { margin:15px 0; color:#b3b3b3; cursor:pointer; }
-.menu p:hover { color:white; }
-.main { flex:1; padding:20px; overflow-y:auto; transition: all 0.3s ease; }
-.topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; flex-wrap:wrap; }
-.search-container { position:relative; width:300px; max-width:100%; }
-.search-container input { width:100%; padding:10px 15px; border-radius:20px; border:none; background:#2a2a2a; color:#ccc; outline:none; }
-.search-results { position:absolute; top:45px; width:100%; background:#181818; border-radius:10px; max-height:200px; overflow-y:auto; display:none; z-index:100; }
-.search-results div { padding:10px; cursor:pointer; border-bottom:1px solid #333; }
-.search-results div:hover { background:#1DB954; color:black; }
-
-.section-title { font-size:22px; margin-bottom:15px; }
-.albums { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:15px; }
-.album { background:#181818; padding:15px; border-radius:10px; cursor:pointer; text-align:center; transition:.3s; }
-.album:hover { background:#1DB954; color:black; transform:scale(1.05); }
-.album img { width:100%; border-radius:8px; }
-.album h4 { margin-top:10px; }
-.album p { font-size:13px; color:#ddd; }
-.song-list { margin-top:30px; }
-.song { display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #333; cursor:pointer; }
-.song:hover { background:#1DB954; color:black; }
-
-.player { position:fixed; bottom:0; left:220px; right:0; background:#181818; display:flex; align-items:center; padding:10px 15px; flex-wrap:wrap; gap:10px; transition: all 0.3s ease; }
-.player button { background:#1DB954; border:none; padding:10px 15px; border-radius:20px; margin-right:10px; cursor:pointer; font-weight:bold; }
-.progress-container { flex:1; display:flex; align-items:center; min-width:150px; }
-.progress { flex:1; height:5px; background:#333; border-radius:5px; margin:0 10px; cursor:pointer; position:relative; }
-.progress-filled { height:5px; background:#1DB954; width:0%; border-radius:5px; }
-
-.page { display:none; }
-.page.active { display:block; }
-
-.play-page { background:linear-gradient(135deg,#1DB954,#121212); padding:50px; min-height:calc(100vh-80px); color:white; }
-.play-album { display:flex; gap:30px; flex-wrap:wrap; }
-.play-album img { width:300px; max-width:100%; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.5); }
-.play-details { flex:1; }
-.play-details h1 { font-size:36px; margin-bottom:10px; }
-.play-details h2 { font-size:24px; color:#ddd; margin-bottom:20px; }
-.lyrics { background:rgba(0,0,0,0.4); padding:20px; border-radius:10px; max-height:400px; overflow-y:auto; white-space:pre-wrap; }
-button:hover { opacity:0.8; }
-
-
-.hamburger { display:none; font-size:24px; cursor:pointer; color:#1DB954; margin-bottom:15px; }
-
-@media (max-width: 1024px){
-  .app { flex-direction:column; }
-  .sidebar { width:100%; display:flex; justify-content:space-around; padding:10px 0; }
-  .player { left:0; flex-direction:column; align-items:flex-start; }
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #121212;
+  color: white;
 }
 
-@media (max-width: 768px){
-  .albums { grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; }
-  .topbar { flex-direction:column; align-items:flex-start; }
-  .player { padding:10px; gap:5px; }
-  .play-page { padding:20px; }
-  .play-details h1 { font-size:28px; }
-  .play-details h2 { font-size:18px; }
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.sidebar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: #000;
+  padding: 10px 0;
 }
 
-@media (max-width: 480px){
-  .album h4 { font-size:14px; }
-  .album p { font-size:12px; }
-  .search-container input { padding:8px 12px; font-size:14px; }
-  .play-album { flex-direction:column; align-items:center; }
-  .play-details { text-align:center; }
-  .hamburger { display:block; }
-  .sidebar { display:none; }
-  .sidebar.active { display:flex; flex-direction:column; }
+.logo {
+  display: none;
+}
+
+.menu p {
+  margin: 0;
+  font-size: 14px;
+  color: #b3b3b3;
+  cursor: pointer;
+}
+
+.menu p:hover {
+  color: white;
+}
+
+.main {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+}
+
+.topbar {
+  margin-bottom: 15px;
+}
+
+.search-container {
+  width: 100%;
+  position: relative;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 20px;
+  border: none;
+  background: #2a2a2a;
+  color: white;
+  outline: none;
+}
+
+.search-results {
+  position: absolute;
+  top: 45px;
+  width: 100%;
+  background: #181818;
+  border-radius: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+  z-index: 10;
+}
+
+.search-results div {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #333;
+}
+
+.search-results div:hover {
+  background: #1DB954;
+  color: black;
+}
+.section-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.albums {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.album {
+  background: #181818;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.album img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.album h4 {
+  font-size: 14px;
+  margin: 8px 0 2px;
+}
+
+.album p {
+  font-size: 12px;
+  color: #aaa;
+}
+
+/* -------- PLAY PAGE -------- */
+.page { display: none; }
+.page.active { display: block; }
+
+.play-page {
+  padding: 20px;
+}
+
+.play-album {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.play-album img {
+  width: 200px;
+  border-radius: 12px;
+}
+
+.play-details {
+  text-align: center;
+}
+
+.play-details h1 {
+  font-size: 22px;
+}
+
+.play-details h2 {
+  font-size: 16px;
+  color: #ccc;
+}
+
+.lyrics {
+  margin-top: 15px;
+  background: rgba(0,0,0,0.4);
+  padding: 15px;
+  border-radius: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+
+/* -------- PLAYER -------- */
+.player {
+  position: sticky;
+  bottom: 0;
+  background: #181818;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+  .player button {
+  background: #1DB954;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+}
+
+.progress {
+  flex: 1;
+  height: 4px;
+  background: #333;
+  margin: 0 8px;
+  cursor: pointer;
+}
+
+.progress-filled {
+  height: 4px;
+  background: #1DB954;
+  width: 0%;
 }
 </style>
 </head>
+
 <body>
 
 <div class="app">
-  <div class="sidebar" id="sidebar">
-    <div class="logo">TuneFlow</div>
+
+  <!-- BOTTOM NAV -->
+  <div class="sidebar">
     <div class="menu">
       <p onclick="showPage('home')">🏠 Home</p>
+    </div>
+    <div class="menu">
       <p onclick="showPage('search')">🔍 Search</p>
+    </div>
+    <div class="menu">
       <p onclick="showPage('library')">🎵 Library</p>
     </div>
   </div>
 
+  <!-- MAIN -->
   <div class="main">
-    <div class="hamburger" onclick="toggleSidebar()">☰ Menu</div>
+
     <div id="home" class="page active">
       <div class="topbar">
         <div class="search-container">
@@ -98,18 +231,22 @@ button:hover { opacity:0.8; }
           <div class="search-results" id="home-results"></div>
         </div>
       </div>
+
       <div class="section-title">Albums</div>
+
       <div class="albums">
         <div class="album" onclick="openPlayPage(0)">
           <img src="down-at-dusk.jpg">
           <h4>Down at Dusk</h4>
           <p>Talha Anjum</p>
         </div>
+
         <div class="album" onclick="openPlayPage(1)">
           <img src="regrets.jpg">
           <h4>Regrets</h4>
           <p>Talha Yunus</p>
         </div>
+
         <div class="album" onclick="openPlayPage(2)">
           <img src="dont-mind.jpg">
           <h4>Don't Mind</h4>
@@ -132,7 +269,7 @@ button:hover { opacity:0.8; }
 
     <div id="play" class="page play-page">
       <div class="play-album">
-        <img id="play-cover" src="">
+        <img id="play-cover">
         <div class="play-details">
           <h1 id="play-title"></h1>
           <h2 id="play-artist"></h2>
@@ -140,14 +277,18 @@ button:hover { opacity:0.8; }
         </div>
       </div>
     </div>
+
   </div>
 </div>
+  <div class="player">
+  <div>
+    <button onclick="prevSong()">⏮</button>
+    <button onclick="togglePlay()">▶ / ⏸</button>
+    <button onclick="nextSong()">⏭</button>
+  </div>
 
-<div class="player">
-  <button onclick="prevSong()">⏮</button>
-  <button onclick="togglePlay()">▶ / ⏸</button>
-  <button onclick="nextSong()">⏭</button>
   <span id="nowPlaying">Select a song</span>
+
   <div class="progress-container">
     <span id="currentTime">0:00</span>
     <div class="progress" onclick="setProgress(event)">
@@ -155,11 +296,11 @@ button:hover { opacity:0.8; }
     </div>
     <span id="duration">0:00</span>
   </div>
+
   <audio id="audio"></audio>
 </div>
 
 <script>
-
 const songs = [
   {
     title:"Down at Dusk",
@@ -167,136 +308,67 @@ const songs = [
     file:"down-at-dusk.mp3",
     cover:"down-at-dusk.jpg",
     lyrics:`Down at dusk I walk alone
-Shadows cast, the city’s tone
-Memories fade, but hearts still roam
-Dreaming of a place called home
-
-The night whispers softly in my ear
-A voice I know, yet not so clear
-Lost in thoughts, my path is near
-Hoping someday you'll be here`
+Shadows cast, the city’s tone`
   },
   {
     title:"Regrets",
     artist:"Talha Yunus",
     file:"regrets.mp3",
     cover:"regrets.jpg",
-    lyrics:`I look back on days gone by
-Moments lost, I wonder why
-Choices made, some were lies
-Regrets that never say goodbye
-
-Echoes of the past remain
-Smiles replaced by silent pain
-Still I rise through sun and rain
-Learning from my past again`
+    lyrics:`I look back on days gone by`
   },
   {
     title:"Don't Mind",
     artist:"Young Stunners",
     file:"dont-mind.mp3",
     cover:"dont-mind.jpg",
-    lyrics:`Step in the light, I walk my way
-Voices talk but I don’t sway
-Music loud, I seize the day
-Dreams alive, they never fray
-
-Haters talk, but I don’t mind
-Life moves fast, I’m on my grind
-Rhythms hit and stars aligned
-In this moment, peace I find`
+    lyrics:`Haters talk, but I don’t mind`
   }
 ];
 
 let currentIndex = 0;
+const audio = document.getElementById("audio");
 
-
-const pages = document.querySelectorAll('.page');
 function showPage(id){
-  pages.forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-
-const audio = document.getElementById('audio');
-const nowPlaying = document.getElementById('nowPlaying');
-const progressFilled = document.getElementById('progressFilled');
-const currentTimeEl = document.getElementById('currentTime');
-const durationEl = document.getElementById('duration');
-const playCover = document.getElementById('play-cover');
-const playTitle = document.getElementById('play-title');
-const playArtist = document.getElementById('play-artist');
-const lyricsDiv = document.getElementById('lyrics');
+function openPlayPage(i){
+  currentIndex = i;
+  const s = songs[i];
+  audio.src = s.file;
+  audio.play();
+  document.getElementById("nowPlaying").innerText = s.title+" - "+s.artist;
+  document.getElementById("play-title").innerText = s.title;
+  document.getElementById("play-artist").innerText = s.artist;
+  document.getElementById("play-cover").src = s.cover;
+  document.getElementById("lyrics").innerText = s.lyrics;
+  showPage("play");
+}
 
 function togglePlay(){ audio.paused ? audio.play() : audio.pause(); }
+function nextSong(){ openPlayPage((currentIndex+1)%songs.length); }
+  function prevSong(){ openPlayPage((currentIndex-1+songs.length)%songs.length); }
 
-audio.addEventListener('timeupdate', ()=>{
-  const percent = (audio.currentTime/audio.duration)*100;
-  progressFilled.style.width = percent+'%';
-  currentTimeEl.textContent = formatTime(audio.currentTime);
-  durationEl.textContent = formatTime(audio.duration);
+audio.addEventListener("timeupdate",()=>{
+  document.getElementById("progressFilled").style.width =
+    (audio.currentTime/audio.duration)*100+"%";
+  document.getElementById("currentTime").innerText = format(audio.currentTime);
+  document.getElementById("duration").innerText = format(audio.duration);
 });
-
-function formatTime(sec){
-  if(isNaN(sec)) return "0:00";
-  let m = Math.floor(sec/60);
-  let s = Math.floor(sec%60);
-  if(s<10) s='0'+s;
-  return m+':'+s;
-}
 
 function setProgress(e){
-  const w = e.currentTarget.clientWidth;
-  const x = e.offsetX;
-  audio.currentTime = (x/w)*audio.duration;
+  audio.currentTime = (e.offsetX / e.currentTarget.clientWidth) * audio.duration;
 }
 
-
-function openPlayPage(index){
-  currentIndex = index;
-  const song = songs[currentIndex];
-  audio.src = song.file;
-  audio.play();
-  nowPlaying.innerText = song.title+" - "+song.artist;
-  playTitle.innerText = song.title;
-  playArtist.innerText = song.artist;
-  playCover.src = song.cover;
-  lyricsDiv.innerHTML = `<pre>${song.lyrics}</pre>`;
-  showPage('play');
-}
-
-function nextSong(){
-  currentIndex = (currentIndex + 1) % songs.length;
-  openPlayPage(currentIndex);
-}
-
-function prevSong(){
-  currentIndex = (currentIndex - 1 + songs.length) % songs.length;
-  openPlayPage(currentIndex);
-}
-
-
-const searchInput = document.getElementById('search-bar');
-const searchResults = document.getElementById('search-results');
-searchInput.addEventListener('input', ()=>{
-  const query = searchInput.value.toLowerCase();
-  searchResults.innerHTML='';
-  if(query===''){ searchResults.style.display='none'; return; }
-  const filtered = songs.filter(s=>s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
-  filtered.forEach((s,i)=>{
-    const div = document.createElement('div');
-    div.innerText = `${s.title} - ${s.artist}`;
-    div.onclick = ()=> openPlayPage(songs.indexOf(s));
-    searchResults.appendChild(div);
-  });
-  searchResults.style.display=filtered.length?'block':'none';
-});
-
-
-function toggleSidebar(){
-  const sidebar = document.getElementById('sidebar');
-  sidebar.classList.toggle('active');
+function format(t){
+  if(isNaN(t)) return "0:00";
+  return Math.floor(t/60)+":"+(Math.floor(t%60)).toString().padStart(2,"0");
 }
 </script>
+
 </body>
 </html>
+
+/* -------- SIDEBAR (BOTTOM NAV ON MOBILE) -------- */
