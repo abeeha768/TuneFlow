@@ -5,21 +5,21 @@
 <title>TuneFlow</title>
 <style>
 body { margin:0; font-family:'Segoe UI',sans-serif; background:#121212; color:white; }
-.app { display:flex; height:100vh; }
-.sidebar { width:220px; background:#000; padding:20px; }
+.app { display:flex; height:100vh; flex-direction:row; transition: all 0.3s ease; }
+.sidebar { width:220px; background:#000; padding:20px; flex-shrink:0; transition: all 0.3s ease; }
 .logo { font-size:24px; font-weight:bold; color:#1DB954; margin-bottom:30px; }
 .menu p { margin:15px 0; color:#b3b3b3; cursor:pointer; }
 .menu p:hover { color:white; }
-.main { flex:1; padding:20px; overflow-y:auto; }
-.topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; }
-.search-container { position:relative; width:300px; }
+.main { flex:1; padding:20px; overflow-y:auto; transition: all 0.3s ease; }
+.topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; flex-wrap:wrap; }
+.search-container { position:relative; width:300px; max-width:100%; }
 .search-container input { width:100%; padding:10px 15px; border-radius:20px; border:none; background:#2a2a2a; color:#ccc; outline:none; }
 .search-results { position:absolute; top:45px; width:100%; background:#181818; border-radius:10px; max-height:200px; overflow-y:auto; display:none; z-index:100; }
 .search-results div { padding:10px; cursor:pointer; border-bottom:1px solid #333; }
 .search-results div:hover { background:#1DB954; color:black; }
 
 .section-title { font-size:22px; margin-bottom:15px; }
-.albums { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:20px; }
+.albums { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:15px; }
 .album { background:#181818; padding:15px; border-radius:10px; cursor:pointer; text-align:center; transition:.3s; }
 .album:hover { background:#1DB954; color:black; transform:scale(1.05); }
 .album img { width:100%; border-radius:8px; }
@@ -29,9 +29,9 @@ body { margin:0; font-family:'Segoe UI',sans-serif; background:#121212; color:wh
 .song { display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #333; cursor:pointer; }
 .song:hover { background:#1DB954; color:black; }
 
-.player { position:fixed; bottom:0; left:220px; right:0; background:#181818; display:flex; align-items:center; padding:15px; }
-.player button { background:#1DB954; border:none; padding:10px 20px; border-radius:20px; margin-right:10px; cursor:pointer; font-weight:bold; }
-.progress-container { flex:1; margin:0 15px; display:flex; align-items:center; }
+.player { position:fixed; bottom:0; left:220px; right:0; background:#181818; display:flex; align-items:center; padding:10px 15px; flex-wrap:wrap; gap:10px; transition: all 0.3s ease; }
+.player button { background:#1DB954; border:none; padding:10px 15px; border-radius:20px; margin-right:10px; cursor:pointer; font-weight:bold; }
+.progress-container { flex:1; display:flex; align-items:center; min-width:150px; }
 .progress { flex:1; height:5px; background:#333; border-radius:5px; margin:0 10px; cursor:pointer; position:relative; }
 .progress-filled { height:5px; background:#1DB954; width:0%; border-radius:5px; }
 
@@ -39,19 +39,48 @@ body { margin:0; font-family:'Segoe UI',sans-serif; background:#121212; color:wh
 .page.active { display:block; }
 
 .play-page { background:linear-gradient(135deg,#1DB954,#121212); padding:50px; min-height:calc(100vh-80px); color:white; }
-.play-album { display:flex; gap:30px; }
-.play-album img { width:300px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.5); }
+.play-album { display:flex; gap:30px; flex-wrap:wrap; }
+.play-album img { width:300px; max-width:100%; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.5); }
 .play-details { flex:1; }
 .play-details h1 { font-size:36px; margin-bottom:10px; }
 .play-details h2 { font-size:24px; color:#ddd; margin-bottom:20px; }
 .lyrics { background:rgba(0,0,0,0.4); padding:20px; border-radius:10px; max-height:400px; overflow-y:auto; white-space:pre-wrap; }
 button:hover { opacity:0.8; }
+
+
+.hamburger { display:none; font-size:24px; cursor:pointer; color:#1DB954; margin-bottom:15px; }
+
+@media (max-width: 1024px){
+  .app { flex-direction:column; }
+  .sidebar { width:100%; display:flex; justify-content:space-around; padding:10px 0; }
+  .player { left:0; flex-direction:column; align-items:flex-start; }
+}
+
+@media (max-width: 768px){
+  .albums { grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; }
+  .topbar { flex-direction:column; align-items:flex-start; }
+  .player { padding:10px; gap:5px; }
+  .play-page { padding:20px; }
+  .play-details h1 { font-size:28px; }
+  .play-details h2 { font-size:18px; }
+}
+
+@media (max-width: 480px){
+  .album h4 { font-size:14px; }
+  .album p { font-size:12px; }
+  .search-container input { padding:8px 12px; font-size:14px; }
+  .play-album { flex-direction:column; align-items:center; }
+  .play-details { text-align:center; }
+  .hamburger { display:block; }
+  .sidebar { display:none; }
+  .sidebar.active { display:flex; flex-direction:column; }
+}
 </style>
 </head>
 <body>
 
 <div class="app">
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div class="logo">TuneFlow</div>
     <div class="menu">
       <p onclick="showPage('home')">🏠 Home</p>
@@ -61,6 +90,7 @@ button:hover { opacity:0.8; }
   </div>
 
   <div class="main">
+    <div class="hamburger" onclick="toggleSidebar()">☰ Menu</div>
     <div id="home" class="page active">
       <div class="topbar">
         <div class="search-container">
@@ -129,7 +159,7 @@ button:hover { opacity:0.8; }
 </div>
 
 <script>
-// Songs library with placeholder lyrics
+
 const songs = [
   {
     title:"Down at Dusk",
@@ -180,14 +210,14 @@ In this moment, peace I find`
 
 let currentIndex = 0;
 
-// Page switching
+
 const pages = document.querySelectorAll('.page');
 function showPage(id){
   pages.forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-// Audio player
+
 const audio = document.getElementById('audio');
 const nowPlaying = document.getElementById('nowPlaying');
 const progressFilled = document.getElementById('progressFilled');
@@ -221,7 +251,7 @@ function setProgress(e){
   audio.currentTime = (x/w)*audio.duration;
 }
 
-// Play page
+
 function openPlayPage(index){
   currentIndex = index;
   const song = songs[currentIndex];
@@ -245,7 +275,7 @@ function prevSong(){
   openPlayPage(currentIndex);
 }
 
-// Search functionality
+
 const searchInput = document.getElementById('search-bar');
 const searchResults = document.getElementById('search-results');
 searchInput.addEventListener('input', ()=>{
@@ -261,6 +291,12 @@ searchInput.addEventListener('input', ()=>{
   });
   searchResults.style.display=filtered.length?'block':'none';
 });
+
+
+function toggleSidebar(){
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('active');
+}
 </script>
 </body>
 </html>
