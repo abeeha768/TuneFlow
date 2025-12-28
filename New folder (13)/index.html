@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TuneFlow</title>
+<style>
+body { margin:0; font-family:'Segoe UI',sans-serif; background:#121212; color:white; }
+.app { display:flex; height:100vh; }
+.sidebar { width:220px; background:#000; padding:20px; }
+.logo { font-size:24px; font-weight:bold; color:#1DB954; margin-bottom:30px; }
+.menu p { margin:15px 0; color:#b3b3b3; cursor:pointer; }
+.menu p:hover { color:white; }
+.main { flex:1; padding:20px; overflow-y:auto; }
+.topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; }
+.search-container { position:relative; width:300px; }
+.search-container input { width:100%; padding:10px 15px; border-radius:20px; border:none; background:#2a2a2a; color:#ccc; outline:none; }
+.search-results { position:absolute; top:45px; width:100%; background:#181818; border-radius:10px; max-height:200px; overflow-y:auto; display:none; z-index:100; }
+.search-results div { padding:10px; cursor:pointer; border-bottom:1px solid #333; }
+.search-results div:hover { background:#1DB954; color:black; }
+
+.section-title { font-size:22px; margin-bottom:15px; }
+.albums { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:20px; }
+.album { background:#181818; padding:15px; border-radius:10px; cursor:pointer; text-align:center; transition:.3s; }
+.album:hover { background:#1DB954; color:black; transform:scale(1.05); }
+.album img { width:100%; border-radius:8px; }
+.album h4 { margin-top:10px; }
+.album p { font-size:13px; color:#ddd; }
+.song-list { margin-top:30px; }
+.song { display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #333; cursor:pointer; }
+.song:hover { background:#1DB954; color:black; }
+
+.player { position:fixed; bottom:0; left:220px; right:0; background:#181818; display:flex; align-items:center; padding:15px; }
+.player button { background:#1DB954; border:none; padding:10px 20px; border-radius:20px; margin-right:10px; cursor:pointer; font-weight:bold; }
+.progress-container { flex:1; margin:0 15px; display:flex; align-items:center; }
+.progress { flex:1; height:5px; background:#333; border-radius:5px; margin:0 10px; cursor:pointer; position:relative; }
+.progress-filled { height:5px; background:#1DB954; width:0%; border-radius:5px; }
+
+.page { display:none; }
+.page.active { display:block; }
+
+.play-page { background:linear-gradient(135deg,#1DB954,#121212); padding:50px; min-height:calc(100vh-80px); color:white; }
+.play-album { display:flex; gap:30px; }
+.play-album img { width:300px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.5); }
+.play-details { flex:1; }
+.play-details h1 { font-size:36px; margin-bottom:10px; }
+.play-details h2 { font-size:24px; color:#ddd; margin-bottom:20px; }
+.lyrics { background:rgba(0,0,0,0.4); padding:20px; border-radius:10px; max-height:400px; overflow-y:auto; white-space:pre-wrap; }
+button:hover { opacity:0.8; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="logo">Spotify</div>
+    <div class="menu">
+      <p onclick="showPage('home')">🏠 Home</p>
+      <p onclick="showPage('search')">🔍 Search</p>
+      <p onclick="showPage('library')">🎵 Library</p>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="home" class="page active">
+      <div class="topbar">
+        <div class="search-container">
+          <input type="text" id="home-search" placeholder="Search songs, artists...">
+          <div class="search-results" id="home-results"></div>
+        </div>
+      </div>
+      <div class="section-title">Albums</div>
+      <div class="albums">
+        <div class="album" onclick="openPlayPage(0)">
+          <img src="down-at-dusk.jpg">
+          <h4>Down at Dusk</h4>
+          <p>Talha Anjum</p>
+        </div>
+        <div class="album" onclick="openPlayPage(1)">
+          <img src="regrets.jpg">
+          <h4>Regrets</h4>
+          <p>Talha Yunus</p>
+        </div>
+        <div class="album" onclick="openPlayPage(2)">
+          <img src="dont-mind.jpg">
+          <h4>Don't Mind</h4>
+          <p>Young Stunners</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="search" class="page">
+      <div class="search-container">
+        <input type="text" id="search-bar" placeholder="Search songs, artists...">
+        <div class="search-results" id="search-results"></div>
+      </div>
+    </div>
+
+    <div id="library" class="page">
+      <h2>Your Library</h2>
+      <p>Library content coming soon...</p>
+    </div>
+
+    <div id="play" class="page play-page">
+      <div class="play-album">
+        <img id="play-cover" src="">
+        <div class="play-details">
+          <h1 id="play-title"></h1>
+          <h2 id="play-artist"></h2>
+          <div class="lyrics" id="lyrics"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="player">
+  <button onclick="prevSong()">⏮</button>
+  <button onclick="togglePlay()">▶ / ⏸</button>
+  <button onclick="nextSong()">⏭</button>
+  <span id="nowPlaying">Select a song</span>
+  <div class="progress-container">
+    <span id="currentTime">0:00</span>
+    <div class="progress" onclick="setProgress(event)">
+      <div class="progress-filled" id="progressFilled"></div>
+    </div>
+    <span id="duration">0:00</span>
+  </div>
+  <audio id="audio"></audio>
+</div>
+
+<script>
+// Songs library with placeholder lyrics
+const songs = [
+  {
+    title:"Down at Dusk",
+    artist:"Talha Anjum",
+    file:"down-at-dusk.mp3",
+    cover:"down-at-dusk.jpg",
+    lyrics:`Down at dusk I walk alone
+Shadows cast, the city’s tone
+Memories fade, but hearts still roam
+Dreaming of a place called home
+
+The night whispers softly in my ear
+A voice I know, yet not so clear
+Lost in thoughts, my path is near
+Hoping someday you'll be here`
+  },
+  {
+    title:"Regrets",
+    artist:"Talha Yunus",
+    file:"regrets.mp3",
+    cover:"regrets.jpg",
+    lyrics:`I look back on days gone by
+Moments lost, I wonder why
+Choices made, some were lies
+Regrets that never say goodbye
+
+Echoes of the past remain
+Smiles replaced by silent pain
+Still I rise through sun and rain
+Learning from my past again`
+  },
+  {
+    title:"Don't Mind",
+    artist:"Young Stunners",
+    file:"dont-mind.mp3",
+    cover:"dont-mind.jpg",
+    lyrics:`Step in the light, I walk my way
+Voices talk but I don’t sway
+Music loud, I seize the day
+Dreams alive, they never fray
+
+Haters talk, but I don’t mind
+Life moves fast, I’m on my grind
+Rhythms hit and stars aligned
+In this moment, peace I find`
+  }
+];
+
+let currentIndex = 0;
+
+// Page switching
+const pages = document.querySelectorAll('.page');
+function showPage(id){
+  pages.forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// Audio player
+const audio = document.getElementById('audio');
+const nowPlaying = document.getElementById('nowPlaying');
+const progressFilled = document.getElementById('progressFilled');
+const currentTimeEl = document.getElementById('currentTime');
+const durationEl = document.getElementById('duration');
+const playCover = document.getElementById('play-cover');
+const playTitle = document.getElementById('play-title');
+const playArtist = document.getElementById('play-artist');
+const lyricsDiv = document.getElementById('lyrics');
+
+function togglePlay(){ audio.paused ? audio.play() : audio.pause(); }
+
+audio.addEventListener('timeupdate', ()=>{
+  const percent = (audio.currentTime/audio.duration)*100;
+  progressFilled.style.width = percent+'%';
+  currentTimeEl.textContent = formatTime(audio.currentTime);
+  durationEl.textContent = formatTime(audio.duration);
+});
+
+function formatTime(sec){
+  if(isNaN(sec)) return "0:00";
+  let m = Math.floor(sec/60);
+  let s = Math.floor(sec%60);
+  if(s<10) s='0'+s;
+  return m+':'+s;
+}
+
+function setProgress(e){
+  const w = e.currentTarget.clientWidth;
+  const x = e.offsetX;
+  audio.currentTime = (x/w)*audio.duration;
+}
+
+// Play page
+function openPlayPage(index){
+  currentIndex = index;
+  const song = songs[currentIndex];
+  audio.src = song.file;
+  audio.play();
+  nowPlaying.innerText = song.title+" - "+song.artist;
+  playTitle.innerText = song.title;
+  playArtist.innerText = song.artist;
+  playCover.src = song.cover;
+  lyricsDiv.innerHTML = `<pre>${song.lyrics}</pre>`;
+  showPage('play');
+}
+
+function nextSong(){
+  currentIndex = (currentIndex + 1) % songs.length;
+  openPlayPage(currentIndex);
+}
+
+function prevSong(){
+  currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+  openPlayPage(currentIndex);
+}
+
+// Search functionality
+const searchInput = document.getElementById('search-bar');
+const searchResults = document.getElementById('search-results');
+searchInput.addEventListener('input', ()=>{
+  const query = searchInput.value.toLowerCase();
+  searchResults.innerHTML='';
+  if(query===''){ searchResults.style.display='none'; return; }
+  const filtered = songs.filter(s=>s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
+  filtered.forEach((s,i)=>{
+    const div = document.createElement('div');
+    div.innerText = `${s.title} - ${s.artist}`;
+    div.onclick = ()=> openPlayPage(songs.indexOf(s));
+    searchResults.appendChild(div);
+  });
+  searchResults.style.display=filtered.length?'block':'none';
+});
+</script>
+</body>
+</html>
